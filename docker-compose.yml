@@ -1,0 +1,54 @@
+
+services:
+  # Mysql database container
+  db:
+    image: mysql
+    container_name: teaching_platform_db_symfony
+    restart: always
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    networks:
+      - teaching_platform
+
+  # phpmyadmin container
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: teaching_platform_phpmyadmin
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 8080:80
+    environment:
+      PMA_HOST: db
+    networks:
+      - teaching_platform
+
+  # Symfony apache project container
+  www:
+    build: docker/php
+    container_name: teaching_platform_symfony
+    ports:
+      - "8741:80"
+    volumes:
+      - ./docker/php/vhosts:/etc/apache2/sites-enabled
+      - ./:/var/www
+    restart: always
+    networks:
+      - teaching_platform
+
+  mailcatcher:
+    image: schickling/mailcatcher
+    container_name: mailcatcher
+    ports:
+      - "1080:1080"
+    expose:
+      - 1025
+
+networks:
+  teaching_platform:
+
+volumes:
+  db-data:
