@@ -5,6 +5,8 @@ services:
     image: mysql
     container_name: teaching_platform_db_symfony
     restart: always
+    ports:
+      - 9001:3306
     volumes:
       - db-data:/var/lib/mysql
     environment:

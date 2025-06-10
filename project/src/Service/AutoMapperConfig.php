@@ -7,6 +7,7 @@ use App\Entity\Lesson;
 use App\Entity\Quiz;
 use App\Entity\QuizQuestion;
 use App\Model\LessonModel;
+use App\Model\NewUserModel;
 use App\Model\QuizModel;
 use App\Model\QuizQuestionModel;
 use AutoMapperPlus\AutoMapperPlusBundle\AutoMapperConfiguratorInterface;
@@ -38,5 +39,6 @@ readonly class AutoMapperConfig implements AutoMapperConfiguratorInterface
 
         $config->registerMapping(DataType::ARRAY, LessonModel::class);
         $config->registerMapping(LessonModel::class, Lesson::class);
+        $config->registerMapping(DataType::ARRAY, NewUserModel::class);
     }
 }

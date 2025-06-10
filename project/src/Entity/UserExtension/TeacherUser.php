@@ -14,6 +14,13 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: TeacherUserRepository::class)]
 class TeacherUser extends User
 {
+    #[ORM\Column]
+    private bool $active = false;
+
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
 
 
     /**
@@ -21,6 +28,13 @@ class TeacherUser extends User
      */
     #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'teacher', orphanRemoval: true)]
     private Collection $quizzes;
+
+
+
+    public function setActive(bool $active): void
+    {
+        $this->active = $active;
+    }
 
     /**
      * @var Collection<int, Lesson>
@@ -38,6 +52,8 @@ class TeacherUser extends User
     {
         return ['ROLE_TEACHER', 'ROLE_USER'];
     }
+
+
 
     /**
      * @return Collection<int, Quiz>
@@ -69,6 +85,7 @@ class TeacherUser extends User
         return $this;
     }
 
+    
     /**
      * @return Collection<int, Lesson>
      */

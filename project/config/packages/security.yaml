@@ -23,6 +23,7 @@ security:
             json_login:
                 check_path: app_login
             provider: app_email_provider
+            user_checker: App\Security\InactiveUserChecker
 
     access_control:
         - { path: ^/api/admin, roles: ROLE_ADMIN }
