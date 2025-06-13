@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: LessonRepository::class)]
 class Lesson implements OwnedResourceInterface
 {
+    #[Groups(['lesson', 'lesson_id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -25,6 +26,53 @@ class Lesson implements OwnedResourceInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?TeacherUser $teacherUser = null;
 
+
+     #[Groups(['lesson'])]
+    #[ORM\Column(length: 255)]
+    private ?string $field = null;
+
+    #[Groups(['lesson'])]
+    #[ORM\Column(length: 255)]
+    private ?string $grade = null;
+
+    #[Groups(['lesson'])]
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
+    private ?string $filename = null;
+
+
+    public function getFilename(): ?string
+    {
+        return $this->filename;
+    }
+
+    public function setFilename(?string $filename): void
+    {
+        $this->filename = $filename;
+    }
+
+    public function setGrade(?string $grade): void
+    {
+        $this->grade = $grade;
+    }
+
+    public function getGrade(): ?string
+    {
+        return $this->grade;
+    }
+
+    public function setField(?string $field): void
+    {
+        $this->field = $field;
+    }
+
+    public function getField(): ?string
+    {
+        return $this->field;
+    }
+
+
+
+    
     public function getId(): ?int
     {
         return $this->id;

@@ -4,16 +4,22 @@ namespace App\Controller;
 
 use App\Entity\Lesson;
 use App\Entity\UserExtension\TeacherUser;
+use App\Form\FileUploadType;
 use App\Model\LessonModel;
 use AutoMapperPlus\AutoMapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\String\ByteString;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class LessonController extends AbstractController
@@ -26,6 +32,66 @@ class LessonController extends AbstractController
     )
     {
     }
+
+
+    
+
+    #[Route(path: "/api/public/lessons", name: "api_lesson_ids", methods: ['GET'])]
+    public function getLessonIds(): JsonResponse
+    {
+        $lessons = $this->entityManager->getRepository(Lesson::class)->findAll();
+        $response = $this->serializer->serialize($lessons, 'json', ['groups' => 'lesson_id']);
+        return JsonResponse::fromJsonString($response);
+    }
+
+
+
+
+
+
+    #[Route(path: "/api/teacher/lessons", name: "api_teacher_lessons", methods: ['GET'])]
+    public function getTeacherLessons(): JsonResponse
+    {
+        $user = $this->getUser();
+        $lessons = $user->getLessons();
+        $response = $this->serializer->serialize($lessons, 'json', ['groups' => 'lesson']);
+        return JsonResponse::fromJsonString($response);
+    }
+    
+
+
+    #[IsGranted('IS_RESOURCE_OWNER', subject: 'lesson', message:'Logged in user does not own resource')]
+    #[Route(path: "/api/teacher/lesson/file/add/{id}", name: "api_lesson_add_file", requirements: ['id' => Requirement::POSITIVE_INT], methods: ['POST'])]
+    public function setFileForLesson(Request $request, Lesson $lesson): JsonResponse
+    {
+        $form = $this->createForm(FileUploadType::class);
+        $form->submit($request->files->all());
+
+        if ($form->isValid()) {
+
+            /** @var UploadedFile $pdfFile */
+            $pdfFile = $form->get('file')->getData();
+            $newFilename = ByteString::fromRandom(32)->toString() . '.' . $pdfFile->guessExtension();
+            try {
+
+                $pdfFile->move(
+                    $this->getParameter('uploads_directory'),
+                    $newFilename
+                );
+                $lesson->setFilename($newFilename);
+                $this->entityManager->flush();
+
+            } catch (Exception $e) {
+                return new JsonResponse(["err" => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+            return new JsonResponse(["message" => "success", "filename" => $newFilename]);
+
+        } else {
+            return new JsonResponse(["err" => $form->getErrors(true)->current()->getMessage()]);
+        }
+
+    }
+
 
     #[Route(path: "/api/teacher/lesson/add", name: "api_lesson_add", methods: ['POST'])]
     public function addLesson(Request $request): JsonResponse
@@ -65,7 +131,7 @@ class LessonController extends AbstractController
     {
         $lesson = $this->entityManager->getRepository(Lesson::class)->find($id);
         if (empty($lesson)) {
-            return new JsonResponse(['error' => 'Quiz not found']);
+            return new JsonResponse(['error' => 'Lesson not found']);
         }
 
         $response = $this->serializer->serialize($lesson, 'json', ['groups' => 'lesson']);
@@ -73,6 +139,7 @@ class LessonController extends AbstractController
     }
 
     #[IsGranted('IS_RESOURCE_OWNER', subject: 'request', message:'Logged in user does not own resource')]
+    #[IsGranted('IS_RESOURCE_OWNER', subject: 'lesson', message:'Logged in user does not own resource')]
     #[Route(path: "/api/teacher/lesson/remove/{id}", name: "api_public_lesson_remove", requirements: ['id' => Requirement::POSITIVE_INT], methods: ["DELETE"])]
     public function removeLesson (Request $request, Lesson $lesson): JsonResponse
     {

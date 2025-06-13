@@ -1,6 +1,7 @@
 parameters:
     app.rsa_public: '%env(file:resolve:RSA_PUBLIC_PATH)%'
     app.rsa_private: '%env(file:resolve:RSA_PRIVATE_PATH)%'
+    uploads_directory: '%kernel.project_dir%/public/uploads'
 services:
     _defaults:
         autowire: true

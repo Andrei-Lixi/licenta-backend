@@ -9,3 +9,4 @@
 /vendor/
 /keys/
 ###< symfony/framework-bundle ###
+/public/uploads/
