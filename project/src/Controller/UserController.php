@@ -161,4 +161,32 @@ class UserController extends AbstractController
 
         return new JsonResponse(['err' => 'work in progress']);
     }
+
+
+
+
+    #[Route('/api/public/available-users', name: 'public_available_users', methods: ['GET'])]
+public function getAvailableUsers(): JsonResponse
+{
+    /** @var User $currentUser */
+    $currentUser = $this->getUser();
+
+    $allUsers = $this->entityManager->getRepository(User::class)->createQueryBuilder('u')
+        ->where('u != :currentUser')
+        ->setParameter('currentUser', $currentUser)
+        ->getQuery()
+        ->getResult();
+
+    $usersData = array_map(function (User $user) {
+        return [
+            'id' => $user->getId(),
+            'name' => $user->getName(),  
+
+        ];
+    }, $allUsers);
+
+    return new JsonResponse($usersData, Response::HTTP_OK);
+}
+
+
 }

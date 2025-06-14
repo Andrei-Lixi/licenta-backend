@@ -7,6 +7,8 @@ use App\Entity\UserExtension\StudentUser;
 use App\Entity\UserExtension\TeacherUser;
 use App\Enum\UserEnum;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation\Timestampable;
@@ -31,7 +33,7 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups('user')]
+    #[Groups(['user', 'message:read'])]
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
@@ -39,7 +41,7 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[Groups('user')]
+    #[Groups(['user', 'message:read', 'lesson'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
     
@@ -55,6 +57,24 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Timestampable(on: 'update')]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
+
+    /**
+     * @var Collection<int, Message>
+     */
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'sender')]
+    private Collection $messagesSent;
+
+    /**
+     * @var Collection<int, Message>
+     */
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'receiver')]
+    private Collection $messagesReceived;
+
+    public function __construct()
+    {
+        $this->messagesSent = new ArrayCollection();
+        $this->messagesReceived = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -146,5 +166,65 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
 
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getMessagesSent(): Collection
+    {
+        return $this->messagesSent;
+    }
+
+    public function addMessagesSent(Message $messagesSent): static
+    {
+        if (!$this->messagesSent->contains($messagesSent)) {
+            $this->messagesSent->add($messagesSent);
+            $messagesSent->setSender($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessagesSent(Message $messagesSent): static
+    {
+        if ($this->messagesSent->removeElement($messagesSent)) {
+            // set the owning side to null (unless already changed)
+            if ($messagesSent->getSender() === $this) {
+                $messagesSent->setSender(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getMessagesReceived(): Collection
+    {
+        return $this->messagesReceived;
+    }
+
+    public function addMessagesReceived(Message $messagesReceived): static
+    {
+        if (!$this->messagesReceived->contains($messagesReceived)) {
+            $this->messagesReceived->add($messagesReceived);
+            $messagesReceived->setReceiver($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessagesReceived(Message $messagesReceived): static
+    {
+        if ($this->messagesReceived->removeElement($messagesReceived)) {
+            // set the owning side to null (unless already changed)
+            if ($messagesReceived->getReceiver() === $this) {
+                $messagesReceived->setReceiver(null);
+            }
+        }
+
+        return $this;
     }
 }

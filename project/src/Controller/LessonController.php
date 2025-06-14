@@ -60,6 +60,21 @@ class LessonController extends AbstractController
     
 
 
+    #[Route(path: "/api/public/teacher/{id}", name: "api_public_teacher_get", requirements: ['id' => '\d+'], methods: ["GET"])]
+public function getTeacherById(int $id): JsonResponse
+{
+    $teacher = $this->entityManager->getRepository(TeacherUser::class)->find($id);
+
+    if (!$teacher) {
+        return new JsonResponse(['error' => 'Teacher not found'], 404);
+    }
+
+    return new JsonResponse([
+        'name' => $teacher->getName(), 
+    ]);
+}
+
+
     #[IsGranted('IS_RESOURCE_OWNER', subject: 'lesson', message:'Logged in user does not own resource')]
     #[Route(path: "/api/teacher/lesson/file/add/{id}", name: "api_lesson_add_file", requirements: ['id' => Requirement::POSITIVE_INT], methods: ['POST'])]
     public function setFileForLesson(Request $request, Lesson $lesson): JsonResponse

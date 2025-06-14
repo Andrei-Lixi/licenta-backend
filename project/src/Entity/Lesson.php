@@ -22,10 +22,17 @@ class Lesson implements OwnedResourceInterface
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+
+    #[Groups(['lesson'])]
     #[ORM\ManyToOne(inversedBy: 'lessons')]
     #[ORM\JoinColumn(nullable: false)]
     private ?TeacherUser $teacherUser = null;
 
+#[Groups(['lesson'])]
+public function getTeacherUserName(): ?string
+{
+    return $this->teacherUser ? $this->teacherUser->getName() : null;
+}
 
      #[Groups(['lesson'])]
     #[ORM\Column(length: 255)]
@@ -40,6 +47,9 @@ class Lesson implements OwnedResourceInterface
     private ?string $filename = null;
 
 
+
+
+    
     public function getFilename(): ?string
     {
         return $this->filename;
