@@ -46,6 +46,8 @@ class Quiz implements OwnedResourceInterface
         return $this->id;
     }
 
+
+    
     /**
      * @return Collection<int, QuizQuestion>
      */

@@ -35,9 +35,17 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
+
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
+    #[Groups('user')]
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+    
+    #[Groups('user')]
+    #[ORM\Column(length: 255)]
+    private ?string $school = null;
 
     #[Timestampable(on: 'create')]
     #[ORM\Column]
@@ -57,6 +65,35 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->email;
     }
+
+    
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getSchool(): ?string
+    {
+        return $this->school;
+    }
+
+    public function setSchool(string $school): static
+    {
+        $this->school = $school;
+
+        return $this;
+    }
+
+
+
 
     public function setEmail(string $email): static
     {

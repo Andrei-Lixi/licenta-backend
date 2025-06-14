@@ -12,26 +12,36 @@ class FixtureData
         [
             'email' => 'email1@fakemail.com',
             'password' => 'parola',
+            'name' => 'Popescu Ion',
+            'school' => 'Pia Bratianu',
             'class' => StudentUser::class
         ],
         [
             'email' => 'email2@fakemail.com',
             'password' => 'parola',
+            'name' => 'Lixandru Andrei',
+            'school' => 'Pia Bratianu',
             'class' => StudentUser::class
         ],
         [
             'email' => 'teacher1@fakemail.com',
             'password' => 'parola',
+            'name' => 'Anton Marian',
+            'school' => 'Pedagogic',
             'class' => TeacherUser::class
         ],
         [
             'email' => 'teacher2@fakemail.com',
             'password' => 'parola',
+            'name' => 'Ion Ion',
+            'school' => 'Sportiv',
             'class' => TeacherUser::class
         ],
         [
             'email' => 'admin1@fakemail.com',
             'password' => 'parola',
+            'name' => 'Admin Principal',
+            'school' => 'Inspectorat',
             'class' => AdminUser::class
         ]
     ];

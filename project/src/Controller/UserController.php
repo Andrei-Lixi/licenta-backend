@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\UserExtension\TeacherUser;
+use App\Entity\UserExtension\StudentUser;
 use App\Model\NewUserModel;
 use App\Service\JwtService;
 use AutoMapperPlus\AutoMapperInterface;
@@ -64,13 +65,22 @@ class UserController extends AbstractController
 
 
 
-    #[Route(path: '/api/admin/user/all', name: 'app_admin_user_all', methods: ['GET'])]
+    #[Route(path: '/api/admin/user/teacher', name: 'app_admin_user_all', methods: ['GET'])]
         public function getAllUsers(): JsonResponse
         {
             $allUsers = $this->entityManager->getRepository(TeacherUser::class)->findAll();
             $data = $this->serializer->serialize($allUsers, 'json', ['groups' => 'user']);
             return JsonResponse::fromJsonString($data, Response::HTTP_OK);
         }
+
+
+        #[Route(path: '/api/admin/user/students', name: 'app_admin_user_students', methods: ['GET'])]
+            public function getAllStudents(): JsonResponse
+            {
+                $students = $this->entityManager->getRepository(StudentUser::class)->findAll();
+                $data = $this->serializer->serialize($students, 'json', ['groups' => 'user']);
+                return JsonResponse::fromJsonString($data, Response::HTTP_OK);
+            }
 
 
 

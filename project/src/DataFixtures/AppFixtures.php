@@ -23,6 +23,15 @@ class AppFixtures extends Fixture
             $hashedPassword = $this->passwordHasher->hashPassword($user, $userData['password']);
             $user->setPassword($hashedPassword);
 
+            if (isset($userData['name'])) {
+            $user->setName($userData['name']);
+            }
+
+        if (isset($userData['school'])) {
+            $user->setSchool($userData['school']);
+             }
+
+
             $manager->persist($user);
         }
 

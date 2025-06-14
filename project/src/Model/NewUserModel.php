@@ -27,6 +27,14 @@ class NewUserModel
     #[Type('string')]
     public $type = null;
 
+    #[NotNull]
+    #[Type('string')]
+    public $name = null;
+
+    #[NotNull]
+    #[Type('string')]
+    public $school = null;
+
     #[IsTrue]
     public function isAllowedType(): bool
     {
@@ -41,6 +49,8 @@ class NewUserModel
         };
 
         $user->setEmail($this->email);
+        $user->setName($this->name);
+        $user->setSchool($this->school);
         $hashedPassword = $userPasswordHasher->hashPassword($user, $this->password);
         $user->setPassword($hashedPassword);
 
