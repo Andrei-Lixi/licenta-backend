@@ -171,6 +171,75 @@ public function getTeacherById(int $id): JsonResponse
 
 
 
+
+
+#[Route('/api/lesson/view/{id}', name: 'lesson_view', methods: ['GET'])]
+public function viewLesson(int $id, EntityManagerInterface $em): Response
+{
+    $lesson = $em->getRepository(Lesson::class)->find($id);
+    if (!$lesson) {
+        return $this->json(['error' => 'Lesson not found'], 404);
+    }
+
+    $lesson->setViews($lesson->getViews() + 1);
+    $em->flush();
+
+    return $this->json($lesson, context: ['groups' => 'lesson:read']);
+}
+
+
+
+
+#[Route('/api/lesson/{id}/like', name: 'lesson_like', methods: ['POST'])]
+public function likeLesson(int $id, EntityManagerInterface $em): Response
+{
+    $lesson = $em->getRepository(Lesson::class)->find($id);
+    if (!$lesson) {
+        return $this->json(['error' => 'Lesson not found'], 404);
+    }
+
+    $lesson->setLikes($lesson->getLikes() + 1);
+    $em->flush();
+
+    return $this->json(['message' => 'Like added']);
+}
+
+#[Route('/api/lesson/{id}/dislike', name: 'lesson_dislike', methods: ['POST'])]
+public function dislikeLesson(int $id, EntityManagerInterface $em): Response
+{
+    $lesson = $em->getRepository(Lesson::class)->find($id);
+    if (!$lesson) {
+        return $this->json(['error' => 'Lesson not found'], 404);
+    }
+
+    $lesson->setDislikes($lesson->getDislikes() + 1);
+    $em->flush();
+
+    return $this->json(['message' => 'Dislike added']);
+}
+
+
+#[Route('/api/lesson/{id}/stats', name: 'lesson_stats', methods: ['GET'])]
+public function lessonStats(int $id, EntityManagerInterface $em): Response
+{
+    $lesson = $em->getRepository(Lesson::class)->find($id);
+    if (!$lesson) {
+        return $this->json(['error' => 'Lesson not found'], 404);
+    }
+
+    return $this->json([
+        'views' => $lesson->getViews(),
+        'likes' => $lesson->getLikes(),
+        'dislikes' => $lesson->getDislikes(),
+    ]);
+}
+
+
+
+
+
+
+
     
 }
 

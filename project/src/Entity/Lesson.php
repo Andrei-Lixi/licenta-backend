@@ -28,11 +28,25 @@ class Lesson implements OwnedResourceInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?TeacherUser $teacherUser = null;
 
-#[Groups(['lesson'])]
-public function getTeacherUserName(): ?string
-{
-    return $this->teacherUser ? $this->teacherUser->getName() : null;
-}
+
+        #[ORM\Column(type: 'integer')]
+        private $views = 0;
+
+        #[ORM\Column(type: 'integer')]
+        private $likes = 0;
+
+        #[ORM\Column(type: 'integer')]
+        private $dislikes = 0;
+
+
+        
+
+
+    #[Groups(['lesson'])]
+    public function getTeacherUserName(): ?string
+    {
+        return $this->teacherUser ? $this->teacherUser->getName() : null;
+    }
 
      #[Groups(['lesson'])]
     #[ORM\Column(length: 255)]
@@ -48,6 +62,40 @@ public function getTeacherUserName(): ?string
 
 
 
+public function getViews(): int
+{
+    return $this->views;
+}
+
+public function setViews(int $views): self
+{
+    $this->views = $views;
+    return $this;
+}
+
+
+
+public function getLikes(): int
+{
+    return $this->likes;
+}
+
+public function setLikes(int $likes): self
+{
+    $this->likes = $likes;
+    return $this;
+}
+
+public function getDislikes(): int
+{
+    return $this->dislikes;
+}
+
+public function setDislikes(int $dislikes): self
+{
+    $this->dislikes = $dislikes;
+    return $this;
+}
 
     
     public function getFilename(): ?string
