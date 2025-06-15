@@ -70,10 +70,17 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'receiver')]
     private Collection $messagesReceived;
 
+    /**
+     * @var Collection<int, UserQuizAnswer>
+     */
+    #[ORM\OneToMany(targetEntity: UserQuizAnswer::class, mappedBy: 'user')]
+    private Collection $userQuizAnswers;
+
     public function __construct()
     {
         $this->messagesSent = new ArrayCollection();
         $this->messagesReceived = new ArrayCollection();
+        $this->userQuizAnswers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -222,6 +229,36 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($messagesReceived->getReceiver() === $this) {
                 $messagesReceived->setReceiver(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserQuizAnswer>
+     */
+    public function getUserQuizAnswers(): Collection
+    {
+        return $this->userQuizAnswers;
+    }
+
+    public function addUserQuizAnswer(UserQuizAnswer $userQuizAnswer): static
+    {
+        if (!$this->userQuizAnswers->contains($userQuizAnswer)) {
+            $this->userQuizAnswers->add($userQuizAnswer);
+            $userQuizAnswer->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserQuizAnswer(UserQuizAnswer $userQuizAnswer): static
+    {
+        if ($this->userQuizAnswers->removeElement($userQuizAnswer)) {
+            // set the owning side to null (unless already changed)
+            if ($userQuizAnswer->getUser() === $this) {
+                $userQuizAnswer->setUser(null);
             }
         }
 
